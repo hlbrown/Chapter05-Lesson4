@@ -1,5 +1,5 @@
 import config from './../config/config'
-import express from 'express'
+import app from 'express'
 
 
 app.listen(config.port, (err) => {
