@@ -7,7 +7,6 @@ const config = {
     mode: "development",
     devtool: 'eval-source-map',
     entry: [
-        'react-hot-loader/patch',
         'webpack-hot-middleware/client?reload=true',
         path.join(CURRENT_WORKING_DIR, 'client/main.js')
     ],
@@ -33,7 +32,12 @@ const config = {
     },  plugins: [
           new webpack.HotModuleReplacementPlugin(),
           new webpack.NoEmitOnErrorsPlugin()
-      ]
+      ],
+      resolve: {
+          alias:{
+              'react-dom': '@hot-loader/react-dom'
+          }
+      }
 }
 
 
