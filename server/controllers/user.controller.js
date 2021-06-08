@@ -6,6 +6,7 @@ const create = async (req, res) => {
     const user = new User(req.body)
     try {
       await user.save()
+
       return res.status(200).json({
         message: "Successfully signed up!"
       })
@@ -47,7 +48,7 @@ const read = (req, res) => {
     req.profile.salt = undefined
     return res.json(req.profile)
 }
-const update = (req, res) => {
+const update = async (req, res) => {
     try {
         let user = req.profile
         user = extend(user, req.body)
