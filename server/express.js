@@ -1,4 +1,5 @@
 import express from 'express'
+import path from 'path'
 import bodyParser from 'body-parser'
 import cookieParser from 'cookie-parser'
 import compress from 'compression'
@@ -10,7 +11,7 @@ import authRoutes from './routes/auth.routes'
 
 
 
-
+const CURRENT_WORKING_DIR = process.cwd()
 const app = express()
 
 app.use(bodyParser.json())
@@ -20,12 +21,16 @@ app.use(compress())
 app.use(helmet())
 app.use(cors())
 
-app.get('/', (req, res) => {
-    res.status(200).send(Template())
-} )
+app.use('/dist', express.static(path.join(CURRENT_WORKING_DIR, 'dist')))
+
+
 
 app.use('/', userRoutes)
 app.use('/', authRoutes)
+
+app.get('/', (req, res) => {
+    res.status(200).send(Template())
+} )
 
 app.use((err, req, res, next) => {
     if (err.name === 'UnauthorizedError') {
