@@ -47,7 +47,7 @@ const read = (req, res) => {
     req.profile.salt = undefined
     return res.json(req.profile)
 }
-const update = (req, res, next) => {
+const update = (req, res) => {
     try {
         let user = req.profile
         user = extend(user, req.body)
