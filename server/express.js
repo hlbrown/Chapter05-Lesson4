@@ -9,14 +9,14 @@ import Template from './../template.js'
 import userRoutes from './routes/user.routes'
 import authRoutes from './routes/auth.routes'
 //only during development then comment out
-import devBundle from './devBundle'
+//import devBundle from './devBundle'
 
 
 const CURRENT_WORKING_DIR = process.cwd()
 
 const app = express()
 //comment out after development
-devBundle.compile(app)
+//devBundle.compile(app)
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
