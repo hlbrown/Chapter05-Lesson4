@@ -1,4 +1,4 @@
-  import React, {useState, useEffect} from 'react'
+import React, {useState, useEffect} from 'react'
 import { makeStyles } from '@material-ui/core/styles'
 import Paper from '@material-ui/core/Paper'
 import List from '@material-ui/core/List'
@@ -29,7 +29,7 @@ export default function Users() {
 
 
     const classes = useStyles()
-    const [users, setUsers] = useState([])
+    const [users, setUsers] = useState("")
 
 
     useEffect(() => {
