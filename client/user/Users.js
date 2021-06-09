@@ -29,7 +29,7 @@ export default function Users() {
 
 
     const classes = useStyles()
-    const [users, setUsers] = useState()
+    const [users, setUsers] = useState([])
 
 
     useEffect(() => {
