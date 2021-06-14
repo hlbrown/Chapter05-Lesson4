@@ -8,6 +8,7 @@ import helmet from 'helmet'
 import Template from './../template.js'
 import userRoutes from './routes/user.routes'
 import authRoutes from './routes/auth.routes'
+import postRoutes from './routes/post.routes'
 
 //modules for server side rendering
 import React from 'react'
@@ -17,6 +18,7 @@ import  {StaticRouter}  from 'react-router-dom'
 
 import { ServerStyleSheets, ThemeProvider } from '@material-ui/styles'
 import theme from './../client/theme'
+
 
 //only during development then comment out
 //import devBundle from './devBundle'
@@ -40,6 +42,7 @@ app.use('/dist', express.static(path.join(CURRENT_WORKING_DIR, 'dist')))
 
 app.use('/', userRoutes)
 app.use('/', authRoutes)
+app.use('/', postRoutes)
 
 app.get('*', (req, res) => {
     const sheets = new ServerStyleSheets()
