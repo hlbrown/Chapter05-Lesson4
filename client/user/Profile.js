@@ -54,7 +54,10 @@ const useStyles = makeStyles(theme => ({
       }
   
     }, [match.params.userId])
-    
+
+    const photoUrl = values.user._id
+              ? `/api/users/photo/${values.user._id}?${new Date().getTime()}`
+              : '/api/users/defaultphoto'    
       if (redirectToSignin) {
         return <Redirect to='/signin'/>
       }
@@ -66,7 +69,7 @@ const useStyles = makeStyles(theme => ({
           <List dense>
             <ListItem>
               <ListItemAvatar>
-                <Avatar>
+                <Avatar src={photoUrl}>
                   <Person/>
                 </Avatar>
               </ListItemAvatar>
@@ -81,6 +84,9 @@ const useStyles = makeStyles(theme => ({
                   <DeleteUser userId={user._id}/>
                 </ListItemSecondaryAction>)
               }
+            </ListItem>
+            <ListItem>
+              <ListItemText primary={this.state.user.about}/>
             </ListItem>
             <Divider/>
             <ListItem>

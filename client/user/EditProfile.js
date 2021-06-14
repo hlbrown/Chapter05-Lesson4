@@ -73,6 +73,12 @@ const useStyles = makeStyles(theme => ({
 
 
   const clickSubmit = () => {
+    let userData = new FormData()
+    values.name && userData.append('name', values.name)
+    values.email && userData.append('email', values.email)
+    values.passoword && userData.append('passoword', values.passoword)
+    values.about && userData.append('about', values.about)
+    values.photo && userData.append('photo', values.photo)
     const user = {
       name: values.name || undefined,
       email: values.email || undefined,
@@ -82,7 +88,7 @@ const useStyles = makeStyles(theme => ({
       userId: match.params.userId
     }, {
       t: jwt.token
-    }, user).then((data) => {
+    }, userData).then((data) => {
       if (data && data.error) {
         setValues({...values, error: data.error})
       } else {
@@ -91,7 +97,10 @@ const useStyles = makeStyles(theme => ({
     })
   }
   const handleChange = name => event => {
-    setValues({...values, [name]: event.target.value})
+    const value = name === 'photo'
+    ? event.target.files[0]
+    : event.target.value
+    setValues({...values, [name]: value})
   }
 
     if (values.redirectToProfile) {
@@ -103,7 +112,21 @@ const useStyles = makeStyles(theme => ({
           <Typography variant="h6" className={classes.title}>
             Edit Profile
           </Typography>
+          <input accept="image/*" type="file" onChange={handleChange('photo')} style={ {display:none} } id="icon-button-file" />
+          <label htmlFor="icon-button-file">
+              <Button variant="contained" color="default" component="span">
+                Upload <FileUpload/>
+              </Button>
+          </label> <span className={classes.filename}>
+              {values.photo ? values.photo.name : ''}
+          </span>
           <TextField id="name" label="Name" className={classes.textField} value={values.name} onChange={handleChange('name')} margin="normal"/><br/>
+          <TextField id="multiline-flexible"
+            label="About"
+            multiline
+            rows="2"
+            value={values.about}
+            onChange={handleChange('about')}/>
           <TextField id="email" type="email" label="Email" className={classes.textField} value={values.email} onChange={handleChange('email')} margin="normal"/><br/>
           <TextField id="password" type="password" label="Password" className={classes.textField} value={values.password} onChange={handleChange('password')} margin="normal"/>
           <br/> {
