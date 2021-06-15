@@ -1,44 +1,50 @@
 import Post from '../models/post.model'
-import _ from 'lodash'
 import errorHandler from './../helpers/dbErrorHandler'
 import formidable from 'formidable'
 import fs from 'fs'
 
 const create = (req, res, next) => {
-    let form = new formidable.IncomingForm()
-    form.keepExtensions = true
-    form.parse(req, (err, fields, files) => {
-      if (err) {
-        return res.status(400).json({
-          error: "Image could not be uploaded"
-        })
-      }
-      let post = new Post(fields)
-      post.postedBy= req.profile
-      if(files.photo){
-        post.photo.data = fs.readFileSync(files.photo.path)
-        post.photo.contentType = files.photo.type
-      }
-      post.save((err, result) => {
-        if (err) {
-          return res.status(400).json({
-            error: errorHandler.getErrorMessage(err)
-          })
-        }
-        res.json(result)
+  let form = new formidable.IncomingForm()
+  form.keepExtensions = true
+  form.parse(req, async (err, fields, files) => {
+    if (err) {
+      return res.status(400).json({
+        error: "Image could not be uploaded"
       })
-    })
-  }
+    }
+    let post = new Post(fields)
+    post.postedBy= req.profile
+    if(files.photo){
+      post.photo.data = fs.readFileSync(files.photo.path)
+      post.photo.contentType = files.photo.type
+    }
+    try {
+      let result = await Post.save()
+      res.json(result)
+    } catch (err) {
+      return res.status(400).json({
+        error: errorHandler.getErrorMessage(err)
+      })
+    }
+  })
+}
   
-  const postByID = (req, res, next, id) => {
-    Post.findById(id).populate('postedBy', '_id name').exec((err, post) => {
-      if (err || !post)
-        return res.status('400').json({
-          error: "Post not found"
-        })
+  const postByID = async (req, res, next, id) => {
+    try{
+      let post = await Post.findById(id)
+                            .populate('postedBy', '_id name')
+                            .exec()
+      if (!post)
+      return res.status(400).json({
+        error: "post not found"
+      })
       req.post = post
       next()
-    })
+    }catch (err){
+      return res.status('400').json({
+        error: "Could not retrieve use port"
+      })
+    }
   }
   
   const listByUser = (req, res) => {
@@ -92,59 +98,57 @@ const create = (req, res, next) => {
       return res.send(req.post.photo.data)
   }
   
-  const like = (req, res) => {
-    Post.findByIdAndUpdate(req.body.postId, {$push: {likes: req.body.userId}}, {new: true})
-    .exec((err, result) => {
-      if (err) {
-        return res.status(400).json({
-          error: errorHandler.getErrorMessage(err)
-        })
-      }
+  const like = async (req, res) => {
+    try{
+      let result = await Post.findByIdAndUpdate(req.body.postId,{$push: {likes: req.body.userId}}, {new: true})
       res.json(result)
-    })
+    }catch (err) {
+      return res.status(400).json({
+        error: errorHandler.getErrorMessage(err)
+      })
+    }
   }
   
-  const unlike = (req, res) => {
-    Post.findByIdAndUpdate(req.body.postId, {$pull: {likes: req.body.userId}}, {new: true})
-    .exec((err, result) => {
-      if (err) {
-        return res.status(400).json({
-          error: errorHandler.getErrorMessage(err)
-        })
-      }
+  const unlike = async (req, res) => {
+    try{
+      let result = await Post.findByIdAndUpdate(req.body.postId, {$pull: {likes: req.body.userId}}, {new: true})
       res.json(result)
-    })
+    }catch(err){
+      return res.status(400).json({
+        error: errorHandler.getErrorMessage(err)
+      })
+    }
   }
   
   
-  const comment = (req, res) => {
+  const comment = async (req, res) => {
     let comment = req.body.comment
     comment.postedBy = req.body.userId
-    Post.findByIdAndUpdate(req.body.postId, {$push: {comments: comment}}, {new: true})
-    .populate('comments.postedBy', '_id name')
-    .populate('postedBy', '_id name')
-    .exec((err, result) => {
-      if (err) {
-        return res.status(400).json({
-          error: errorHandler.getErrorMessage(err)
-        })
-      }
+    try{
+      let result = await Post.findByIdAndUpdate(req.body.postId, {$push: {comments: comment}}, {new: true})
+                              .populate('comments.postedBy', '_id name')
+                              .populate('postedBy', '_id name')
+                              .exec()
       res.json(result)
-    })
+    }catch(err){
+      return res.status(400).json({
+        error: errorHandler.getErrorMessage(err)
+      })
+    }
   }
-  const uncomment = (req, res) => {
+  const uncomment = async (req, res) => {
     let comment = req.body.comment
-    Post.findByIdAndUpdate(req.body.postId, {$pull: {comments: {_id: comment._id}}}, {new: true})
-    .populate('comments.postedBy', '_id name')
-    .populate('postedBy', '_id name')
-    .exec((err, result) => {
-      if (err) {
-        return res.status(400).json({
-          error: errorHandler.getErrorMessage(err)
-        })
-      }
+    try{
+      let result = await Post.findByIdAndUpdate(req.body.postId, {$pull: {comments: {_id: comment._id}}}, {new: true})
+                            .populate('comments.postedBy', '_id name')
+                            .populate('postedBy', '_id name')
+                            .exec()
       res.json(result)
-    })
+    }catch(err){
+      return res.status(400).json({
+        error: errorHandler.getErrorMessage(err)
+      })
+    }
   }
   
   const isPoster = (req, res, next) => {
